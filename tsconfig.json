@@ -1,0 +1,55 @@
+{
+  "compilerOptions": {
+    // Enable type checking for JS files
+    "allowJs": true,
+    "checkJs": true,
+    
+    // Don't emit files (we're just type checking)
+    "noEmit": true,
+    
+    // Modern JS features
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020", "DOM"],
+    
+    // Strict type checking
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    
+    // Module resolution
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Additional checks
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    
+    // Skip lib checking for faster performance
+    "skipLibCheck": true,
+    
+    // Base URL for module resolution
+    "baseUrl": ".",
+    
+    // Type roots
+    "typeRoots": [
+      "node_modules/@types"
+    ]
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "*.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "docker",
+    "coverage",
+    "dist"
+  ]
+}

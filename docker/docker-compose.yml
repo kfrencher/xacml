@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  authzforce:
+    image: authzforce/server:12.0.1
+    container_name: authzforce-server
+    ports:
+      - "8080:8080"
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    volumes:
+      - authzforce-data:/opt/authzforce-ce-server/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/authzforce-ce/domains || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - xacml-test-network
+
+  # Optional: Add a simple health check service
+  healthcheck:
+    image: curlimages/curl:latest
+    container_name: authzforce-healthcheck
+    depends_on:
+      authzforce:
+        condition: service_healthy
+    command: >
+      sh -c "
+        echo 'Waiting for AuthzForce to be ready...' &&
+        until curl -f http://authzforce:8080/authzforce-ce/domains; do
+          echo 'AuthzForce not ready yet...'
+          sleep 5
+        done &&
+        echo 'AuthzForce is ready!'
+      "
+    networks:
+      - xacml-test-network
+
+volumes:
+  authzforce-data:
+    driver: local
+
+networks:
+  xacml-test-network:
+    driver: bridge
