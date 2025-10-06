@@ -1,4 +1,4 @@
-const logger = require('../src/logger');
+import logger from '../src/logger.js';
 
 // Jest setup file for XACML tests
 

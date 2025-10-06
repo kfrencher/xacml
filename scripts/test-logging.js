@@ -1,4 +1,4 @@
-const logger = require('../src/logger');
+import logger from '../src/logger.js';
 
 // Test different log levels
 console.log('Testing logging system...\n');

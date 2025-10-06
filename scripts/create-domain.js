@@ -1,5 +1,5 @@
-const AuthzForceClient = require('../src/authzforce-client');
-const logger = require('../src/logger');
+import AuthzForceClient from '../src/authzforce-client.js';
+import logger from '../src/logger.js';
 
 /**
  * @param {string} domainId 

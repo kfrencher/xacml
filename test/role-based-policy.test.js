@@ -1,6 +1,6 @@
-const AuthzForceClient = require('../src/authzforce-client');
-const XacmlTestUtils = require('../src/test-utils');
-const logger = require('../src/logger');
+import AuthzForceClient from '../src/authzforce-client.js';
+import XacmlTestUtils from '../src/test-utils.js';
+import logger from '../src/logger.js';
 
 // Test configuration
 const testConfig = XacmlTestUtils.createTestSuite({

@@ -1,8 +1,8 @@
-const axios = require('axios');
-const xml2js = require('xml2js');
-const js2xmlparser = require('js2xmlparser');
-const logger = require('./logger');
-const {formatXml} = require('./xml-utils');
+import axios from 'axios';
+import xml2js from 'xml2js';
+import * as js2xmlparser from 'js2xmlparser';
+import logger from './logger.js';
+import { formatXml } from './xml-utils.js';
 
 /**
  * @typedef {Object} XacmlSubject
@@ -392,4 +392,4 @@ class AuthzForceClient {
   }
 }
 
-module.exports = AuthzForceClient;
+export default AuthzForceClient;

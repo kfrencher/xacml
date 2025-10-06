@@ -67,4 +67,4 @@ class Logger {
 // Export a singleton instance
 const logger = new Logger();
 
-module.exports = logger;
+export default logger;

@@ -1,5 +1,6 @@
-const AuthzForceClient = require('../src/authzforce-client');
-const logger = require('../src/logger');
+import AuthzForceClient from '../src/authzforce-client.js';
+import logger from '../src/logger.js';
+import xml2js from 'xml2js';
 
 /**
  * @param {string} domainId 
@@ -11,7 +12,7 @@ async function listPolicies(domainId) {
     const response = await client.axios.get(`/domains/${domainId}/pap/policies`);
     const xml = response.data;
     logger.debug('Policies XML:', xml);
-    const parser = new (require('xml2js').Parser)();
+    const parser = new xml2js.Parser();
     const result = await parser.parseStringPromise(xml);
     const links = result['ns2:resources']['ns5:link'] || [];
     logger.info(`Found ${links.length} policy.`);

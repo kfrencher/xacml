@@ -1,6 +1,6 @@
-const AuthzForceClient = require('../src/authzforce-client');
-const { formatXml } = require('../src/xml-utils');
-const logger = require('../src/logger');
+import AuthzForceClient from '../src/authzforce-client.js';
+import { formatXml } from '../src/xml-utils.js';
+import logger from '../src/logger.js';
 
 /**
  * @param {string} domainId 

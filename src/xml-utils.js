@@ -44,7 +44,4 @@ function minifyXml(xml) {
     .replace(/\n/g, '');
 }
 
-module.exports = {
-  formatXml,
-  minifyXml
-};
+export { formatXml, minifyXml };

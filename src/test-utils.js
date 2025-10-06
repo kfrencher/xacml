@@ -1,6 +1,7 @@
-const fs = require('fs').promises;
-const path = require('path');
-const logger = require('./logger');
+import fs from 'fs/promises';
+import path from 'path';
+import logger from './logger.js';
+import AuthzForceClient from './authzforce-client';
 
 /**
  * @typedef {import('./authzforce-client').XacmlRequest} XacmlRequest
@@ -211,7 +212,7 @@ class XacmlTestUtils {
 
   /**
    * Cleanup test domains (for use in test teardown)
-   * @param {import('./authzforce-client')} client - AuthzForce client instance
+   * @param {AuthzForceClient} client - AuthzForce client instance
    * @param {Array<string>} domainIds - Array of domain IDs to cleanup
    * @returns {Promise<void>} Promise that resolves when all cleanup attempts complete
    */
@@ -300,4 +301,4 @@ class XacmlTestUtils {
   }
 }
 
-module.exports = XacmlTestUtils;
+export default XacmlTestUtils;
