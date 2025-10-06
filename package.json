@@ -12,7 +12,12 @@
     "docker:up": "docker-compose -f docker/docker-compose.yml up -d",
     "docker:down": "docker-compose -f docker/docker-compose.yml down",
     "docker:logs": "docker-compose -f docker/docker-compose.yml logs -f authzforce",
-    "authzforce:clean-domains": "node scripts/clean-domains.js"
+    "authzforce:clean-domains": "node scripts/clean-domains.js",
+    "authzforce:list-domains": "node scripts/list-domains.js",
+    "authzforce:list-policies": "node scripts/list-policies.js",
+    "authzforce:get-policy": "node scripts/get-policy.js",
+    "authzforce:create-domain": "node scripts/create-domain.js",
+    "authzforce:get-domain": "node scripts/get-domain.js"
   },
   "dependencies": {
     "axios": "^1.5.0",

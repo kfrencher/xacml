@@ -264,6 +264,13 @@ class XacmlTestUtils {
    * @returns {string|null} Policy ID or null if not found
    */
   static extractPolicyId(policyXml) {
+    // First try to extract PolicySetId
+    const policySetIdMatch = policyXml.match(/PolicySetId="([^"]+)"/);
+    if (policySetIdMatch) {
+      return policySetIdMatch[1];
+    }
+    
+    // Fallback to PolicyId for individual policies
     const policyIdMatch = policyXml.match(/PolicyId="([^"]+)"/);
     return policyIdMatch ? policyIdMatch[1] : null;
   }

@@ -1,4 +1,4 @@
-const AuthzForceClient = require('./authzforce-client');
+const AuthzForceClient = require('../src/authzforce-client');
 
 async function deleteAllDomains() {
   const client = new AuthzForceClient();

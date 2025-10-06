@@ -45,7 +45,7 @@ describe(testConfig.name, () => {
     const policyId = XacmlTestUtils.extractPolicyId(policyXml);
     if(policyId) {
       const version = await client.addPolicy(domainId, policyXml, policyId);
-      await client.setActivePolicy(domainId, policyId, version);
+      await client.setActivePolicy(domainId, policyId);
     } else {
       throw new Error('Failed to extract policy ID from the role-based policy XML');
     }

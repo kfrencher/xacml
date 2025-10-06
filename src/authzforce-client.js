@@ -129,13 +129,15 @@ class AuthzForceClient {
    * @throws {Error} When policy addition fails
    */
   async addPolicy(domainId, policyXml, policyId) {
+
     try {
       const response = await this.axios.post(
         `/domains/${domainId}/pap/policies`,
         policyXml,
         {
           headers: {
-            'Content-Type': 'application/xml'
+            'Content-Type': 'application/xml',
+            'Accept': 'application/xml'
           }
         }
       );
@@ -143,8 +145,23 @@ class AuthzForceClient {
       // Extract policy version from response
       const parser = new xml2js.Parser();
       const result = await parser.parseStringPromise(response.data);
-      return result.link?.$.href?.split('/').pop();
+      
+      // The href format is: "PolicySetId/Version", e.g., "MinimalTestPolicySet/1.0"
+      const href = result?.['ns5:link']?.$?.href;
+      const version = href ? href.split('/').pop() : null;
+      
+      return version;
     } catch (error) {
+      console.error('Error adding policy:', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = /** @type {any} */ (error);
+        console.error('Response status:', axiosError.response?.status);
+        console.error('Response headers:', axiosError.response?.headers);
+        console.error('Response data:', axiosError.response?.data);
+        console.error('Request URL:', axiosError.config?.url);
+        console.error('Request method:', axiosError.config?.method);
+        console.error('Request headers:', axiosError.config?.headers);
+      }
       throw new Error(`Failed to add policy ${policyId}: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -153,31 +170,42 @@ class AuthzForceClient {
    * Set the active policy version for a domain
    * @param {string} domainId - Domain ID
    * @param {string} policyId - Policy ID
-   * @param {string} version - Policy version
    * @returns {Promise<void>}
    * @throws {Error} When setting active policy fails
    */
-  async setActivePolicy(domainId, policyId, version) {
-    const policyRefUpdate = {
-      '@': {
-        'xmlns': 'http://authzforce.github.io/rest-api-model/xmlns/authz/5'
-      },
-      policyRef: {
-        '@': {
-          'Version': version
-        },
-        '#': policyId
-      }
-    };
-
-    const requestBody = js2xmlparser.parse('policyRefUpdate', policyRefUpdate);
+  async setActivePolicy(domainId, policyId) {
+    // Try the basic format without the wrapper element
+    const requestBody = 
+    `<?xml version="1.0" encoding="UTF-8"?>
+      <pdpPropertiesUpdate xmlns="http://authzforce.github.io/rest-api-model/xmlns/authz/5">
+        <rootPolicyRefExpression>${policyId}</rootPolicyRefExpression>
+      </pdpPropertiesUpdate>`;
 
     try {
+      console.log(`Setting root policy for domain ${domainId} with policyId ${policyId}`);
+      console.log(`Request body: ${requestBody}`);
+      
       await this.axios.put(
         `/domains/${domainId}/pap/pdp.properties`,
-        requestBody
+        requestBody,
+        {
+          headers: {
+            'Content-Type': 'application/xml',
+            'Accept': 'application/xml'
+          }
+        }
       );
     } catch (error) {
+      console.error('Error setting active policy:', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = /** @type {any} */ (error);
+        console.error('Response status:', axiosError.response?.status);
+        console.error('Response headers:', axiosError.response?.headers);
+        console.error('Response data:', axiosError.response?.data);
+        console.error('Request URL:', axiosError.config?.url);
+        console.error('Request method:', axiosError.config?.method);
+        console.error('Request headers:', axiosError.config?.headers);
+      }
       throw new Error(`Failed to set active policy: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -191,20 +219,31 @@ class AuthzForceClient {
    */
   async evaluateRequest(domainId, request) {
     const requestXml = this.buildRequestXml(request);
-
+    
     try {
       const response = await this.axios.post(
         `/domains/${domainId}/pdp`,
         requestXml,
         {
           headers: {
-            'Content-Type': 'application/xml'
+            'Content-Type': 'application/xml',
+            'Accept': 'application/xml'
           }
         }
       );
-
+      
       return await this.parseDecisionResponse(response.data);
     } catch (error) {
+      console.error('Error evaluating request:', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = /** @type {any} */ (error);
+        console.error('Response status:', axiosError.response?.status);
+        console.error('Response headers:', axiosError.response?.headers);
+        console.error('Response data:', axiosError.response?.data);
+        console.error('Request URL:', axiosError.config?.url);
+        console.error('Request method:', axiosError.config?.method);
+        console.error('Request headers:', axiosError.config?.headers);
+      }
       throw new Error(`Failed to evaluate request: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -224,7 +263,6 @@ class AuthzForceClient {
         attributes.push({
           '@': {
             'AttributeId': `urn:oasis:names:tc:xacml:1.0:subject:${key}`,
-            'DataType': 'http://www.w3.org/2001/XMLSchema#string',
             'IncludeInResult': 'false'
           },
           'AttributeValue': {
@@ -243,7 +281,6 @@ class AuthzForceClient {
         attributes.push({
           '@': {
             'AttributeId': `urn:oasis:names:tc:xacml:1.0:resource:${key}`,
-            'DataType': 'http://www.w3.org/2001/XMLSchema#string',
             'IncludeInResult': 'false'
           },
           'AttributeValue': {
@@ -262,7 +299,6 @@ class AuthzForceClient {
         attributes.push({
           '@': {
             'AttributeId': `urn:oasis:names:tc:xacml:1.0:action:${key}`,
-            'DataType': 'http://www.w3.org/2001/XMLSchema#string',
             'IncludeInResult': 'false'
           },
           'AttributeValue': {
@@ -316,15 +352,25 @@ class AuthzForceClient {
     const parser = new xml2js.Parser();
     const result = await parser.parseStringPromise(responseXml);
     
-    const response = result.Response;
-    const decision = response.Result[0].Decision[0];
-    const status = response.Result[0].Status;
+    // Handle namespaced response
+    const response = result['ns3:Response'] || result.Response;
+    if (!response) {
+      throw new Error('No Response element found in parsed result');
+    }
+    
+    const resultElement = response['ns3:Result'] || response.Result;
+    if (!resultElement || !resultElement[0]) {
+      throw new Error('No Result element found in response');
+    }
+    
+    const decision = (resultElement[0]['ns3:Decision'] || resultElement[0].Decision)[0];
+    const status = resultElement[0]['ns3:Status'] || resultElement[0].Status;
     
     return {
       decision,
       status: status ? status[0].StatusCode[0].$.Value : null,
-      obligations: response.Result[0].Obligations || [],
-      advice: response.Result[0].AssociatedAdvice || []
+      obligations: resultElement[0].Obligations || [],
+      advice: resultElement[0].AssociatedAdvice || []
     };
   }
 
