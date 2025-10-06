@@ -1,6 +1,8 @@
 const axios = require('axios');
 const xml2js = require('xml2js');
 const js2xmlparser = require('js2xmlparser');
+const logger = require('./logger');
+const {formatXml} = require('./xml-utils');
 
 /**
  * @typedef {Object} XacmlSubject
@@ -92,12 +94,12 @@ class AuthzForceClient {
 
     try {
       const response = await this.axios.post('/domains', requestBody);
-      console.log(`Created domain with response: ${response.data}`);
+      logger.debug(`Created domain with response: ${response.data}`);
       
       // Extract domain ID from response
       const parser = new xml2js.Parser();
       const result = await parser.parseStringPromise(response.data);
-      console.log(`Created domain with processed response: ${JSON.stringify(result,null,4)}`);
+      logger.debug(`Created domain with processed response: ${JSON.stringify(result,null,4)}`);
       const createdDomainId = result['ns5:link']?.$.href?.split('/').pop();
       
       return createdDomainId;
@@ -182,8 +184,8 @@ class AuthzForceClient {
       </pdpPropertiesUpdate>`;
 
     try {
-      console.log(`Setting root policy for domain ${domainId} with policyId ${policyId}`);
-      console.log(`Request body: ${requestBody}`);
+      logger.debug(`Setting root policy for domain ${domainId} with policyId ${policyId}`);
+      logger.debug(`Request body: ${requestBody}`);
       
       await this.axios.put(
         `/domains/${domainId}/pap/pdp.properties`,
@@ -196,14 +198,14 @@ class AuthzForceClient {
         }
       );
     } catch (error) {
-      console.error('Error setting active policy:', error);
+      logger.error('Error setting active policy:', error);
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = /** @type {any} */ (error);
-        console.error('Response status:', axiosError.response?.status);
-        console.error('Response headers:', axiosError.response?.headers);
-        console.error('Response data:', axiosError.response?.data);
-        console.error('Request URL:', axiosError.config?.url);
-        console.error('Request method:', axiosError.config?.method);
+        logger.error('Response status:', axiosError.response?.status);
+        logger.error('Response headers:', axiosError.response?.headers);
+        logger.error('Response data:', axiosError.response?.data);
+        logger.error('Request URL:', axiosError.config?.url);
+        logger.error('Request method:', axiosError.config?.method);
         console.error('Request headers:', axiosError.config?.headers);
       }
       throw new Error(`Failed to set active policy: ${error instanceof Error ? error.message : String(error)}`);
@@ -232,6 +234,8 @@ class AuthzForceClient {
         }
       );
       
+      logger.debug(`Evaluation response: ${formatXml(response.data)}`);
+
       return await this.parseDecisionResponse(response.data);
     } catch (error) {
       console.error('Error evaluating request:', error);

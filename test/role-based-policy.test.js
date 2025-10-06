@@ -1,5 +1,6 @@
 const AuthzForceClient = require('../src/authzforce-client');
 const XacmlTestUtils = require('../src/test-utils');
+const logger = require('../src/logger');
 
 // Test configuration
 const testConfig = XacmlTestUtils.createTestSuite({
@@ -30,14 +31,14 @@ describe(testConfig.name, () => {
       throw new Error(`AuthzForce server not available at ${testConfig.authzForceUrl}`);
     }
     
-    console.log('AuthzForce server is ready');
+    logger.debug('AuthzForce server is ready');
   }, testConfig.setupTimeout);
 
   beforeEach(async () => {
     // Create a new domain for each test
     domainId = XacmlTestUtils.generateDomainId('rbac-test');
     domainId = await client.createDomain(domainId);
-    console.log(`Created domain: ${domainId}`);
+    logger.debug(`Created domain: ${domainId}`);
     createdDomains.push(domainId);
     
     // Load and deploy the role-based policy

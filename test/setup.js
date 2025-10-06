@@ -1,3 +1,5 @@
+const logger = require('../src/logger');
+
 // Jest setup file for XACML tests
 
 // Increase default timeout for tests that involve network calls
@@ -19,8 +21,8 @@ if (process.env.NODE_ENV === 'test' && !process.env.VERBOSE_TESTS) {
 
 // Setup for handling async test cleanup
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-console.log('XACML Test Suite initialized');
-console.log(`AuthzForce URL: ${process.env.AUTHZFORCE_URL || 'http://localhost:8080/authzforce-ce'}`);
+logger.info('XACML Test Suite initialized');
+logger.info(`AuthzForce URL: ${process.env.AUTHZFORCE_URL || 'http://localhost:8080/authzforce-ce'}`);

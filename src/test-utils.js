@@ -1,5 +1,6 @@
 const fs = require('fs').promises;
 const path = require('path');
+const logger = require('./logger');
 
 /**
  * @typedef {import('./authzforce-client').XacmlRequest} XacmlRequest
@@ -110,7 +111,7 @@ class XacmlTestUtils {
     return {
       subject: {
         id: subject.id || 'anonymous',
-        role: subject.role || 'user',
+        role: subject.role || '',
         ...subject
       },
       resource: {
@@ -220,7 +221,7 @@ class XacmlTestUtils {
         await client.deleteDomain(domainId);
       } catch (error) {
         // Log but don't fail test cleanup
-        console.warn(`Failed to cleanup domain ${domainId}: ${error instanceof Error ? error.message : String(error)}`);
+        logger.warn(`Failed to cleanup domain ${domainId}: ${error instanceof Error ? error.message : String(error)}`);
       }
     });
     

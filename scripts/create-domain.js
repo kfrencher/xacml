@@ -1,4 +1,5 @@
 const AuthzForceClient = require('../src/authzforce-client');
+const logger = require('../src/logger');
 
 /**
  * @param {string} domainId 
@@ -7,9 +8,9 @@ async function createDomain(domainId) {
   const client = new AuthzForceClient();
   try {
     client.createDomain(domainId);
-    console.log(`Domain ${domainId} created successfully.`);
+    logger.info(`Domain ${domainId} created successfully.`);
   } catch (error) {
-    console.error('Error creating domain:', error);
+    logger.error('Error creating domain:', error);
   }
 }
 

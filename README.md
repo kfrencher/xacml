@@ -44,6 +44,40 @@ A comprehensive Node.js testing framework for XACML policies using AuthzForce RE
    npm test
    ```
 
+## ⚙️ Configuration
+
+### Environment Variables
+
+Create a `.env` file (or copy from `.env.example`) to configure the framework:
+
+```bash
+# AuthzForce Server Configuration
+AUTHZFORCE_URL=http://localhost:8080/authzforce-ce
+
+# Logging Configuration
+# Available levels: ERROR, WARN, INFO, DEBUG
+LOG_LEVEL=INFO
+```
+
+### Logging Levels
+
+- **ERROR**: Only error messages (minimal output)
+- **WARN**: Warnings and errors
+- **INFO**: General information, warnings, and errors (default)
+- **DEBUG**: Verbose logging for development and troubleshooting
+
+Examples:
+```bash
+# For development with verbose output
+LOG_LEVEL=DEBUG npm test
+
+# For production with minimal output
+LOG_LEVEL=ERROR npm test
+
+# View only policy evaluation results
+LOG_LEVEL=WARN npm test
+```
+
 ## 📁 Project Structure
 
 ```

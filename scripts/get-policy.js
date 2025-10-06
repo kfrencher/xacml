@@ -1,5 +1,6 @@
 const AuthzForceClient = require('../src/authzforce-client');
 const { formatXml } = require('../src/xml-utils');
+const logger = require('../src/logger');
 
 /**
  * @param {string} domainId 
@@ -12,9 +13,9 @@ async function getPolicy(domainId, policyId) {
     const response = await client.axios.get(`/domains/${domainId}/pap/policies/${policyId}/latest`);
     const xml = response.data;
     const formattedXml = formatXml(xml);
-    console.log('Policy XML:\n' + formattedXml);
+    logger.info('Policy XML:\n' + formattedXml);
   } catch (error) {
-    console.error(`Error listing policy ${policyId} for domain ${domainId}:`, error);
+    logger.error(`Error listing policy ${policyId} for domain ${domainId}:`, error);
   }
 }
 
