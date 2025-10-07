@@ -16,6 +16,7 @@ import AuthzForceClient from './authzforce-client';
  * @typedef {Object} TestCaseRequest
  * @property {Partial<XacmlSubject>} [subject] - Subject attributes
  * @property {Partial<XacmlResource>} [resource] - Resource attributes
+ * @property {Partial<XacmlResource>[]} [resources] - Resource attributes
  * @property {Partial<XacmlAction>} [action] - Action attributes
  * @property {Partial<XacmlEnvironment>} [environment] - Environment attributes
  */
@@ -106,19 +107,14 @@ class XacmlTestUtils {
   static createRequest({
     subject = {},
     resource = {},
+    resources = [],
     action = {},
     environment = {}
   } = {}) {
-    return {
+    const request =  {
       subject: {
-        id: subject.id || 'anonymous',
-        role: subject.role || '',
+        id: subject.id,
         ...subject
-      },
-      resource: {
-        id: resource.id || 'default-resource',
-        type: resource.type || 'document',
-        ...resource
       },
       action: {
         id: action.id || 'read',
@@ -129,6 +125,17 @@ class XacmlTestUtils {
         ...environment
       }
     };
+
+    if(resource && Object.keys(resource).length > 0) {
+      request.resource = {
+        id: resource.id,
+        ...resource
+      };
+    }
+    if(resources && Array.isArray(resources) && resources.length > 0) {
+      request.resources = [...resources];
+    }
+    return request;
   }
 
   /**

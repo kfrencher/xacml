@@ -37,6 +37,7 @@ import { formatXml } from './xml-utils.js';
  * @typedef {Object} XacmlRequest
  * @property {XacmlSubject} [subject] - Subject attributes
  * @property {XacmlResource} [resource] - Resource attributes
+ * @property {XacmlResource[]} [resources] - Resource attributes
  * @property {XacmlAction} [action] - Action attributes
  * @property {XacmlEnvironment} [environment] - Environment attributes
  */
@@ -294,6 +295,24 @@ class AuthzForceClient {
             },
             '#': value
           }
+        });
+      });
+    }
+    if (request.resources) {
+      request.resources.forEach((res) => {
+        Object.entries(res).forEach(([key, value]) => {
+          attributes.push({
+            '@': {
+              'AttributeId': `urn:oasis:names:tc:xacml:1.0:resource:${key}`,
+              'IncludeInResult': 'false'
+            },
+            'AttributeValue': {
+              '@': {
+                'DataType': 'http://www.w3.org/2001/XMLSchema#string'
+              },
+              '#': value
+            }
+          });
         });
       });
     }

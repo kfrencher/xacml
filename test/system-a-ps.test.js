@@ -59,7 +59,7 @@ describe('System-a', () => {
     test('system-a should be able to read person datasource', async () => {
       const request = XacmlTestUtils.createRequest({
         subject: { id: 'system-a', role: '' },
-        resource: { id: 'type', type: 'urn:klf:ds:person' },
+        resource: { id: 'urn:klf:ds:person' },
         action: { id: 'read' }
       });
 
@@ -73,7 +73,7 @@ describe('System-a', () => {
     test('system-a should not be able to write person datasource', async () => {
       const request = XacmlTestUtils.createRequest({
         subject: { id: 'system-a', role: '' },
-        resource: { id: 'type', type: 'urn:klf:ds:person' },
+        resource: { id: 'urn:klf:ds:person' },
         action: { id: 'write' }
       });
 
@@ -82,6 +82,95 @@ describe('System-a', () => {
       XacmlTestUtils.assertDecision(result, {
         decision: 'Deny'
       }, 'system-a should not be able to write person datasource');
+    });
+
+    test('system-a should be able to read person.name field', async () => {
+      const request = XacmlTestUtils.createRequest({
+        subject: { id: 'system-a', role: '' },
+        resources: [
+          { id: 'urn:klf:ds:person' },
+          { id: 'urn:klf:ds:field:person.name' }
+        ],
+        action: { id: 'read' }
+      });
+
+      const result = await client.evaluateRequest(domainId, request);
+      
+      XacmlTestUtils.assertDecision(result, {
+        decision: 'Permit'
+      }, 'system-a should be able to read person.name field');
+    });
+
+    test('system-a should be able to read person.dob field', async () => {
+      const request = XacmlTestUtils.createRequest({
+        subject: { id: 'system-a', role: '' },
+        resources: [
+          { id: 'urn:klf:ds:person' },
+          { id: 'urn:klf:ds:field:person.dob' }
+        ],
+        action: { id: 'read' }
+      });
+
+      const result = await client.evaluateRequest(domainId, request);
+      
+      XacmlTestUtils.assertDecision(result, {
+        decision: 'Permit'
+      }, 'system-a should be able to read person.name field');
+    });
+
+    test('system-a should be able to read person.dob and person.name field', async () => {
+      const request = XacmlTestUtils.createRequest({
+        subject: { id: 'system-a', role: '' },
+        resources: [
+          { id: 'urn:klf:ds:person' },
+          { id: 'urn:klf:ds:field:person.name' },
+          { id: 'urn:klf:ds:field:person.dob' }
+        ],
+        action: { id: 'read' }
+      });
+
+      const result = await client.evaluateRequest(domainId, request);
+      
+      XacmlTestUtils.assertDecision(result, {
+        decision: 'Permit'
+      }, 'system-a should be able to read person.name and person.dob field');
+    });
+
+    test('system-a should not be able to read person.dob and person.name and person.ssn field', async () => {
+      const request = XacmlTestUtils.createRequest({
+        subject: { id: 'system-a', role: '' },
+        resources: [
+          { id: 'urn:klf:ds:person' },
+          { id: 'urn:klf:ds:field:person.name' },
+          { id: 'urn:klf:ds:field:person.dob' },
+          { id: 'urn:klf:ds:field:person.ssn' }
+        ],
+        action: { id: 'read' }
+      });
+
+      const result = await client.evaluateRequest(domainId, request);
+      
+      XacmlTestUtils.assertDecision(result, {
+        decision: 'Deny'
+      }, 'system-a should not be able to read person.dob and person.name and person.ssn field');
+    });
+
+
+    test('system-a should not be able to read person.ssn field', async () => {
+      const request = XacmlTestUtils.createRequest({
+        subject: { id: 'system-a', role: '' },
+        resources: [
+          { id: 'urn:klf:ds:person' },
+          { id: 'urn:klf:ds:field:person.ssn' }
+        ],
+        action: { id: 'read' }
+      });
+
+      const result = await client.evaluateRequest(domainId, request);
+      
+      XacmlTestUtils.assertDecision(result, {
+        decision: 'Deny'
+      }, 'system-a should not be able to read person.ssn field');
     });
   });
 });

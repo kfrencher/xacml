@@ -2,7 +2,7 @@
 <PolicySet
   PolicySetId="urn:klf:app:system-a_urn:klf:ds:person"
   Version="1.0"
-  PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:deny-unless-permit"
+  PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:ordered-deny-overrides"
   xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 https://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd">
@@ -13,7 +13,7 @@
       <AllOf>
         <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
           <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:klf:ds:person</AttributeValue>
-          <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:type"
+          <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
             Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
             DataType="http://www.w3.org/2001/XMLSchema#string"
             MustBePresent="true" />
@@ -22,7 +22,7 @@
     </AnyOf>
   </Target>
 
-  <Policy PolicyId="policy-1"
+  <Policy PolicyId="read-dataset"
     Version="1.0"
     RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
 
@@ -46,25 +46,20 @@
 
   </Policy>
 
-  <Policy PolicyId="person.ssn" Version="1.0" RuleCombiningAlgId="">
+  <!-- Read to a specific field -->
+   <PolicySet
+    PolicySetId="read-dataset-fields"
+    Version="1.0"
+    PolicyCombiningAlgId="urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:first-applicable">
 
-    <Description>Read access to person.ssn attribute</Description>
-
+    <!-- Match all fields -->
     <Target>
       <AnyOf>
         <AllOf>
-          <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
-            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">
-              urn:klf:ds:attr:person.ssn</AttributeValue>
+          <Match MatchId="urn:oasis:names:tc:xacml:3.0:function:string-starts-with">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:klf:ds:field:person.</AttributeValue>
             <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
               Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
-              DataType="http://www.w3.org/2001/XMLSchema#string"
-              MustBePresent="true" />
-          </Match>
-          <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
-            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
-            <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:id"
-              Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
               DataType="http://www.w3.org/2001/XMLSchema#string"
               MustBePresent="true" />
           </Match>
@@ -72,7 +67,65 @@
       </AnyOf>
     </Target>
 
-    <Rule RuleId="PermitRead" Effect="Permit" />
-  </Policy>
+    <!-- If deciding on a field and haven't matched anything yet then deny access -->
+    <Policy PolicyId="deny-unauthorized-fields" Version="1.0"
+      RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+
+      <Description>
+        Allow read access to specific fields using regex whitelist
+        If the field is not in the whitelist then deny access
+      </Description>
+
+      <Target/>
+
+      <Rule RuleId="PermitRead" Effect="Deny">
+        <Condition>
+          <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:not">
+            <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:all-of">
+              <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match"/>
+              <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">^urn:klf:ds:person|urn:klf:ds:field:person\.(name|dob)$</AttributeValue>
+              <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
+                MustBePresent="true"
+                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                DataType="http://www.w3.org/2001/XMLSchema#string"/>
+            </Apply>
+          </Apply>
+        </Condition>
+      </Rule>
+
+    </Policy>
+
+    <Policy PolicyId="allow-read-field" Version="1.0"
+      RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+
+      <Description>Allow read access to fields</Description>
+
+      <Target>
+        <!-- name, dob -->
+        <AnyOf>
+          <AllOf>
+            <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+              <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:klf:ds:field:person.name</AttributeValue>
+              <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
+                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                DataType="http://www.w3.org/2001/XMLSchema#string"
+                MustBePresent="true" />
+            </Match>
+          </AllOf>
+          <AllOf>
+            <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+              <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:klf:ds:field:person.dob</AttributeValue>
+              <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
+                Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
+                DataType="http://www.w3.org/2001/XMLSchema#string"
+                MustBePresent="true" />
+            </Match>
+          </AllOf>
+        </AnyOf>
+      </Target>
+
+      <Rule RuleId="rule-1" Effect="Permit" />
+    </Policy>
+  </PolicySet>
 
 </PolicySet>
