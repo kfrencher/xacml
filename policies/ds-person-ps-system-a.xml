@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PolicySet
+  PolicySetId="urn:klf:ds:person:system-a"
+  Version="1.0"
+  PolicyCombiningAlgId="urn:oasis:names:tc:xacml:3.0:policy-combining-algorithm:deny-unless-permit"
+  xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 https://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd">
+
+  <!-- apply to system-a -->
+  <Target>
+    <AnyOf>
+      <AllOf>
+        <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+          <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">system-a</AttributeValue>
+          <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:subject:id"
+            Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject"
+            DataType="http://www.w3.org/2001/XMLSchema#string"
+            MustBePresent="true" />
+        </Match>
+      </AllOf>
+    </AnyOf>
+  </Target>
+
+  <!-- Allow read access -->
+  <Policy PolicyId="policy-1"
+    Version="1.0"
+    RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable">
+
+    <Description>Minimal test policy</Description>
+
+    <Target>
+      <AnyOf>
+        <AllOf>
+          <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+            <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+            <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:id"
+              Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
+              DataType="http://www.w3.org/2001/XMLSchema#string"
+              MustBePresent="true" />
+          </Match>
+        </AllOf>
+      </AnyOf>
+    </Target>
+
+    <Rule RuleId="PermitAll" Effect="Permit">
+      <Description>Permit all requests</Description>
+    </Rule>
+
+  </Policy>
+
+</PolicySet>

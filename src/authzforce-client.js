@@ -221,6 +221,7 @@ class AuthzForceClient {
    */
   async evaluateRequest(domainId, request) {
     const requestXml = this.buildRequestXml(request);
+    logger.debug(`Evaluating request XML:\n${formatXml(requestXml)}`);
     
     try {
       const response = await this.axios.post(
