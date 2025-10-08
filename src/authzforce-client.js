@@ -145,6 +145,8 @@ class AuthzForceClient {
         }
       );
 
+      logger.debug(`Added policy with response: ${formatXml(response.data)}`);
+
       // Extract policy version from response
       const parser = new xml2js.Parser();
       const result = await parser.parseStringPromise(response.data);
@@ -160,7 +162,7 @@ class AuthzForceClient {
         const axiosError = /** @type {any} */ (error);
         console.error('Response status:', axiosError.response?.status);
         console.error('Response headers:', axiosError.response?.headers);
-        console.error('Response data:', axiosError.response?.data);
+        console.error('Response data:', formatXml(axiosError.response?.data));
         console.error('Request URL:', axiosError.config?.url);
         console.error('Request method:', axiosError.config?.method);
         console.error('Request headers:', axiosError.config?.headers);
