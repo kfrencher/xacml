@@ -32,7 +32,7 @@ namespace system_a {
       // Grant field-level permit for listed fields only
       policyset fields {
         // Only use this policyset if there are field-level resources
-        target clause stringStartsWith("urn:klf:ds:field:group.", resourceId)
+        target clause stringStartsWith("urn:klf:ds:field", resourceId)
 
         apply firstApplicable
 
