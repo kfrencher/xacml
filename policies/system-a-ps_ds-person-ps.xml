@@ -13,7 +13,7 @@
       <AllOf>
         <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
           <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:klf:ds:person</AttributeValue>
-          <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
+          <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
             Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
             DataType="http://www.w3.org/2001/XMLSchema#string"
             MustBePresent="true" />
@@ -35,7 +35,7 @@
         <AllOf>
           <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
-            <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:id"
+            <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
               Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action"
               DataType="http://www.w3.org/2001/XMLSchema#string"
               MustBePresent="true" />
@@ -60,7 +60,7 @@
         <AllOf>
           <Match MatchId="urn:oasis:names:tc:xacml:3.0:function:string-starts-with">
             <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:klf:ds:field:person.</AttributeValue>
-            <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
+            <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
               Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
               DataType="http://www.w3.org/2001/XMLSchema#string"
               MustBePresent="true" />
@@ -86,7 +86,7 @@
             <Apply FunctionId="urn:oasis:names:tc:xacml:3.0:function:all-of">
               <Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-regexp-match"/>
               <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">^(urn:klf:ds:person|urn:klf:ds:field:person\.(name|dob))$</AttributeValue>
-              <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
+              <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
                 MustBePresent="true"
                 Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
                 DataType="http://www.w3.org/2001/XMLSchema#string"/>
@@ -108,7 +108,7 @@
           <AllOf>
             <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
               <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:klf:ds:field:person.name</AttributeValue>
-              <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
+              <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
                 Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
                 DataType="http://www.w3.org/2001/XMLSchema#string"
                 MustBePresent="true" />
@@ -117,7 +117,7 @@
           <AllOf>
             <Match MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
               <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">urn:klf:ds:field:person.dob</AttributeValue>
-              <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:id"
+              <AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
                 Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource"
                 DataType="http://www.w3.org/2001/XMLSchema#string"
                 MustBePresent="true" />

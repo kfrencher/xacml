@@ -113,11 +113,11 @@ class XacmlTestUtils {
   } = {}) {
     const request =  {
       subject: {
-        id: subject.id,
+        id: subject['subject-id'],
         ...subject
       },
       action: {
-        id: action.id || 'read',
+        id: action['action-id'] || 'read',
         ...action
       },
       environment: {
@@ -128,7 +128,7 @@ class XacmlTestUtils {
 
     if(resource && Object.keys(resource).length > 0) {
       request.resource = {
-        id: resource.id,
+        id: resource['resource-id'],
         ...resource
       };
     }

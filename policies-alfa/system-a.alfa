@@ -1,0 +1,15 @@
+namespace system_a {
+  /*
+   * Main policy set for person dataset access
+   * Uses deny-unless-permit for secure-by-default behavior
+   */
+  policyset root {
+      target clause Attributes.subjectId == "system-a"
+
+      apply denyUnlessPermit
+
+      system_a.persondataset
+      system_a.groupdataset
+
+  }
+}

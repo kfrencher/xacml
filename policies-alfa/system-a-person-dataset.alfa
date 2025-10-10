@@ -1,0 +1,66 @@
+/*
+ * ALFA Policy: System A Person Dataset Access Control
+ * 
+ * This policy provides field-level access control for person dataset:
+ * - Permits read access to the complete person dataset  
+ * - Permits read access only to person.name and person.dob fields
+ * - Denies access to all other person fields (secure by default)
+ */
+
+namespace system_a {
+
+    import System.*
+    import Attributes.*
+
+    policyset persondataset {
+        // Constrain to person dataset
+      target clause resourceId == "urn:klf:ds:person" 
+
+      apply orderedDenyOverrides
+
+      // Allow read access to the complete person dataset
+      policy {
+        target clause actionId == "read"
+
+        apply denyUnlessPermit
+
+        rule {
+          permit
+        }
+      }
+
+      // Grant field-level permit for listed fields only
+      policyset fields {
+        // Only use this policyset if there are field-level resources
+        target clause stringStartsWith("urn:klf:ds:field:person.", resourceId)
+
+        apply firstApplicable
+
+        // Deny access to all other fields by default
+        // This constrains the requested fields to a whitelist
+        policy denyUnauthorizedFields {
+
+          apply firstApplicable
+
+          rule {
+              deny
+
+              condition not(allOf(function[stringRegexpMatch],"^(urn:klf:ds:person|urn:klf:ds:field:person\\.(name|dob))$", resourceId))
+          }
+        }
+
+        // Allow access to specific fields
+        policy allowedFields {
+          target clause 
+            resourceId == "urn:klf:ds:field:person.name" or
+            resourceId == "urn:klf:ds:field:person.dob"
+
+          apply firstApplicable
+
+          rule {
+            permit
+          }
+        }
+      }
+    }
+}

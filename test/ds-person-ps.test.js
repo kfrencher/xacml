@@ -58,9 +58,9 @@ describe('Person datasource', () => {
 
     test('system-a should be able to read person datasource', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'system-a', role: '' },
-        resource: { id: 'type', type: 'urn:klf:ds:person' },
-        action: { id: 'read' }
+        subject: { 'subject-id': 'system-a', role: '' },
+        resource: { 'resource-id': 'type', type: 'urn:klf:ds:person' },
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -72,9 +72,9 @@ describe('Person datasource', () => {
 
     test('system-a should not be able to write person datasource', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'system-a', role: '' },
-        resource: { id: 'type', type: 'urn:klf:ds:person' },
-        action: { id: 'write' }
+        subject: { 'subject-id': 'system-a', role: '' },
+        resource: { 'resource-id': 'type', type: 'urn:klf:ds:person' },
+        action: { 'action-id': 'write' }
       });
 
       const result = await client.evaluateRequest(domainId, request);

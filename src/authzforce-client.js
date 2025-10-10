@@ -6,7 +6,7 @@ import { formatXml } from './xml-utils.js';
 
 /**
  * @typedef {Object} XacmlSubject
- * @property {string} [id] - Subject identifier
+ * @property {string} [subject-id] - Subject identifier
  * @property {string} [role] - Subject role
  * @property {string} [department] - Subject department
  * @property {string} [clearance] - Subject security clearance
@@ -14,7 +14,7 @@ import { formatXml } from './xml-utils.js';
 
 /**
  * @typedef {Object} XacmlResource
- * @property {string} [id] - Resource identifier
+ * @property {string} [resource-id] - Resource identifier
  * @property {string} [type] - Resource type
  * @property {string} [owner] - Resource owner
  * @property {string} [classification] - Resource classification
@@ -22,7 +22,7 @@ import { formatXml } from './xml-utils.js';
 
 /**
  * @typedef {Object} XacmlAction
- * @property {string} [id] - Action identifier (read, write, delete, etc.)
+ * @property {string} [action-id] - Action identifier (read, write, delete, etc.)
  * @property {string} [method] - HTTP method
  */
 

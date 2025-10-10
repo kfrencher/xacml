@@ -51,16 +51,19 @@ describe('System-a', () => {
       domainId = await client.createDomain(domainId);
       createdDomains.push(domainId);
       
-      await loadPolicy(client, domainId, './policies/system-a-ps_ds-person-ps.xml');
-      const { policyId } = await loadPolicy(client, domainId, './policies/system-a-ps.xml');
+      // await loadPolicy(client, domainId, './policies/system-a-ps_ds-person-ps.xml');
+      // const { policyId } = await loadPolicy(client, domainId, './policies/system-a-ps.xml');
+      await loadPolicy(client, domainId, './build/system_a.groupdataset.xml');
+      await loadPolicy(client, domainId, './build/system_a.persondataset.xml');
+      const {policyId} = await loadPolicy(client, domainId, './build/system_a.root.xml');
       await client.setActivePolicy(domainId, policyId);
     });
 
     test('system-a should be able to read person datasource', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'system-a', role: '' },
-        resource: { id: 'urn:klf:ds:person' },
-        action: { id: 'read' }
+        subject: { 'subject-id': 'system-a', role: '' },
+        resource: { 'resource-id': 'urn:klf:ds:person' },
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -72,9 +75,9 @@ describe('System-a', () => {
 
     test('system-a should not be able to write person datasource', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'system-a', role: '' },
-        resource: { id: 'urn:klf:ds:person' },
-        action: { id: 'write' }
+        subject: { 'subject-id': 'system-a', role: '' },
+        resource: { 'resource-id': 'urn:klf:ds:person' },
+        action: { 'action-id': 'write' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -86,12 +89,12 @@ describe('System-a', () => {
 
     test('system-a should be able to read person.name field', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'system-a', role: '' },
+        subject: { 'subject-id': 'system-a', role: '' },
         resources: [
-          { id: 'urn:klf:ds:person' },
-          { id: 'urn:klf:ds:field:person.name' }
+          { 'resource-id': 'urn:klf:ds:person' },
+          { 'resource-id': 'urn:klf:ds:field:person.name' }
         ],
-        action: { id: 'read' }
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -103,12 +106,12 @@ describe('System-a', () => {
 
     test('system-a should be able to read person.dob field', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'system-a', role: '' },
+        subject: { 'subject-id': 'system-a', role: '' },
         resources: [
-          { id: 'urn:klf:ds:person' },
-          { id: 'urn:klf:ds:field:person.dob' }
+          { 'resource-id': 'urn:klf:ds:person' },
+          { 'resource-id': 'urn:klf:ds:field:person.dob' }
         ],
-        action: { id: 'read' }
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -120,13 +123,13 @@ describe('System-a', () => {
 
     test('system-a should be able to read person.dob and person.name field', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'system-a', role: '' },
+        subject: { 'subject-id': 'system-a', role: '' },
         resources: [
-          { id: 'urn:klf:ds:person' },
-          { id: 'urn:klf:ds:field:person.name' },
-          { id: 'urn:klf:ds:field:person.dob' }
+          { 'resource-id': 'urn:klf:ds:person' },
+          { 'resource-id': 'urn:klf:ds:field:person.name' },
+          { 'resource-id': 'urn:klf:ds:field:person.dob' }
         ],
-        action: { id: 'read' }
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -138,14 +141,14 @@ describe('System-a', () => {
 
     test('system-a should not be able to read person.dob and person.name and person.ssn field', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'system-a', role: '' },
+        subject: { 'subject-id': 'system-a', role: '' },
         resources: [
-          { id: 'urn:klf:ds:person' },
-          { id: 'urn:klf:ds:field:person.name' },
-          { id: 'urn:klf:ds:field:person.dob' },
-          { id: 'urn:klf:ds:field:person.ssn' }
+          { 'resource-id': 'urn:klf:ds:person' },
+          { 'resource-id': 'urn:klf:ds:field:person.name' },
+          { 'resource-id': 'urn:klf:ds:field:person.dob' },
+          { 'resource-id': 'urn:klf:ds:field:person.ssn' }
         ],
-        action: { id: 'read' }
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -158,12 +161,12 @@ describe('System-a', () => {
 
     test('system-a should not be able to read person.ssn field', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'system-a', role: '' },
+        subject: { 'subject-id': 'system-a', role: '' },
         resources: [
-          { id: 'urn:klf:ds:person' },
-          { id: 'urn:klf:ds:field:person.ssn' }
+          { 'resource-id': 'urn:klf:ds:person' },
+          { 'resource-id': 'urn:klf:ds:field:person.ssn' }
         ],
-        action: { id: 'read' }
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);

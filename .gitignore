@@ -75,3 +75,6 @@ policy-backups/
 
 # Generated documentation
 docs/generated/
+
+# Build artifacts
+src-gen/

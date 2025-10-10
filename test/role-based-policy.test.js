@@ -62,9 +62,9 @@ describe(testConfig.name, () => {
   describe('Administrator Access', () => {
     test('Admin can read documents', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'admin1', role: 'admin' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'read' }
+        subject: { 'subject-id': 'admin1', role: 'admin' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -76,9 +76,9 @@ describe(testConfig.name, () => {
 
     test('Admin can update documents', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'admin1', role: 'admin' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'update' }
+        subject: { 'subject-id': 'admin1', role: 'admin' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'update' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -90,9 +90,9 @@ describe(testConfig.name, () => {
 
     test('Admin can delete documents', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'admin1', role: 'admin' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'delete' }
+        subject: { 'subject-id': 'admin1', role: 'admin' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'delete' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -106,9 +106,9 @@ describe(testConfig.name, () => {
   describe('Manager Access', () => {
     test('Manager can read documents', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'manager1', role: 'manager' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'read' }
+        subject: { 'subject-id': 'manager1', role: 'manager' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -120,9 +120,9 @@ describe(testConfig.name, () => {
 
     test('Manager can update documents', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'manager1', role: 'manager' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'update' }
+        subject: { 'subject-id': 'manager1', role: 'manager' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'update' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -134,9 +134,9 @@ describe(testConfig.name, () => {
 
     test('Manager cannot delete documents', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'manager1', role: 'manager' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'delete' }
+        subject: { 'subject-id': 'manager1', role: 'manager' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'delete' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -150,9 +150,9 @@ describe(testConfig.name, () => {
   describe('User Access', () => {
     test('User can read documents', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'user1', role: 'user' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'read' }
+        subject: { 'subject-id': 'user1', role: 'user' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -164,9 +164,9 @@ describe(testConfig.name, () => {
 
     test('User cannot update documents', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'user1', role: 'user' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'update' }
+        subject: { 'subject-id': 'user1', role: 'user' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'update' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -178,9 +178,9 @@ describe(testConfig.name, () => {
 
     test('User cannot delete documents', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'user1', role: 'user' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'delete' }
+        subject: { 'subject-id': 'user1', role: 'user' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'delete' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -194,9 +194,9 @@ describe(testConfig.name, () => {
   describe('Edge Cases', () => {
     test('Unknown role denied access', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'unknown1', role: 'guest' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'read' }
+        subject: { 'subject-id': 'unknown1', role: 'guest' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
@@ -208,9 +208,9 @@ describe(testConfig.name, () => {
 
     test('Missing role denied access', async () => {
       const request = XacmlTestUtils.createRequest({
-        subject: { id: 'norole1' },
-        resource: { id: 'doc123', type: 'document' },
-        action: { id: 'read' }
+        subject: { 'subject-id': 'norole1' },
+        resource: { 'resource-id': 'doc123', type: 'document' },
+        action: { 'action-id': 'read' }
       });
 
       const result = await client.evaluateRequest(domainId, request);
