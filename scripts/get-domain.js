@@ -1,5 +1,5 @@
-const AuthzForceClient = require('../src/authzforce-client');
-const { formatXml } = require('../src/xml-utils');
+import AuthzForceClient from '../src/authzforce-client.js';
+import { formatXml } from '../src/xml-utils.js';
 
 /**
  * @param {string} domainId 

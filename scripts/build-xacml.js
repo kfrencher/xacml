@@ -54,7 +54,12 @@ function formatXML(xmlString) {
       result.push('  '.repeat(indentLevel) + fullTag);
     } else {
       // Opening tag - check if it contains inline text content
-      const tagName = fullTag.match(/<(\w+)/)[1];
+      const tagNameMatch = fullTag.match(/^<([\w:-]+)/);
+      const tagName = tagNameMatch ? tagNameMatch[1] : null;
+      if(tagName == null) {
+        throw new Error('Failed to extract tag name from XML.');
+      }
+
       const closingTagStart = xmlString.indexOf(`</${tagName}>`, tagEnd + 1);
       
       if (closingTagStart !== -1) {
@@ -135,7 +140,8 @@ async function processXmlFile(srcPath, destPath) {
     
     console.log(`✅ Processed: ${path.basename(srcPath)} -> ${path.basename(destPath)}`);
   } catch (error) {
-    console.error(`❌ Error processing ${srcPath}:`, error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`❌ Error processing ${srcPath}:`, errorMessage);
     throw error;
   }
 }
@@ -191,7 +197,8 @@ async function buildXacmlFiles() {
     console.log(`📦 Built files are in: ${BUILD_DIR}`);
     
   } catch (error) {
-    console.error('❌ Build failed:', error.message);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('❌ Build failed:', errorMessage);
     process.exit(1);
   }
 }

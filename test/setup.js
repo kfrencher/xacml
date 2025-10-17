@@ -25,4 +25,4 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 logger.info('XACML Test Suite initialized');
-logger.info(`AuthzForce URL: ${process.env.AUTHZFORCE_URL || 'http://localhost:8080/authzforce-ce'}`);
+logger.info(`AuthzForce URL: ${process.env.AUTHZFORCE_URL || 'http://127.0.0.1:8080/authzforce-ce'}`);

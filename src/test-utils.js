@@ -291,7 +291,7 @@ class XacmlTestUtils {
    */
   static createTestSuite({
     name = 'XACML Policy Test Suite',
-    authzForceUrl = 'http://localhost:8080/authzforce-ce',
+    authzForceUrl = 'http://127.0.0.1:8080/authzforce-ce',
     timeout = 30000,
     retries = 1,
     parallel = false,

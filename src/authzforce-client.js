@@ -1,5 +1,7 @@
 import axios from 'axios';
-import xml2js from 'xml2js';
+import xpath from 'xpath';
+import { DOMParser } from '@xmldom/xmldom';
+import { isNodeLike } from '@xmldom/is-dom-node';
 import * as js2xmlparser from 'js2xmlparser';
 import logger from './logger.js';
 import { formatXml } from './xml-utils.js';
@@ -57,9 +59,9 @@ import { formatXml } from './xml-utils.js';
 class AuthzForceClient {
   /**
    * Create a new AuthzForce client
-   * @param {string} [baseUrl='http://localhost:8080/authzforce-ce'] - Base URL of AuthzForce server
+   * @param {string} [baseUrl='http://127.0.0.1:8080/authzforce-ce'] - Base URL of AuthzForce server
    */
-  constructor(baseUrl = 'http://localhost:8080/authzforce-ce') {
+  constructor(baseUrl = 'http://127.0.0.1:8080/authzforce-ce') {
     /** @type {string} */
     this.baseUrl = baseUrl;
     /** @type {import('axios').AxiosInstance} */
@@ -71,6 +73,42 @@ class AuthzForceClient {
         'Accept': 'application/xml'
       }
     });
+
+    // Initialize namespace resolver
+    this.namespaceResolver = this.createNamespaceResolver();
+  }
+
+  /**
+   * Create namespace resolver for XPath queries
+   * @returns {Function} Namespace resolver function
+   * @private
+   */
+  createNamespaceResolver() {
+    const namespaces = {
+      'authz': 'http://authzforce.github.io/rest-api-model/xmlns/authz/5',
+      'xacml': 'urn:oasis:names:tc:xacml:3.0:core:schema:wd-17'
+    };
+    
+    return (prefix) => namespaces[prefix] || null;
+  }
+
+  /**
+   * Parse XML string to DOM document
+   * @param {string} xmlString - XML string to parse
+   * @returns {Document} Parsed XML document
+   * @private
+   */
+  parseXmlToDom(xmlString) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlString, 'text/xml');
+    
+    // Check for parsing errors
+    const parseError = doc.getElementsByTagName('parsererror')[0];
+    if (parseError) {
+      throw new Error(`XML parsing error: ${parseError.textContent}`);
+    }
+    
+    return doc;
   }
 
   /**
@@ -97,11 +135,20 @@ class AuthzForceClient {
       const response = await this.axios.post('/domains', requestBody);
       logger.debug(`Created domain with response: ${response.data}`);
       
-      // Extract domain ID from response
-      const parser = new xml2js.Parser();
-      const result = await parser.parseStringPromise(response.data);
-      logger.debug(`Created domain with processed response: ${JSON.stringify(result,null,4)}`);
-      const createdDomainId = result['ns5:link']?.$.href?.split('/').pop();
+      // Parse with DOM and use XPath
+      const doc = this.parseXmlToDom(response.data);
+      
+      // Use XPath to find the href attribute regardless of namespace prefix
+      const hrefAttribute = xpath.select1('//*[local-name()="link"]/@href', doc);
+      if(!(isNodeLike(hrefAttribute))) {
+        throw new Error('No link element found in create domain response. Link element is required to extract domain ID.');
+      }
+      const href = hrefAttribute.nodeValue;
+      const createdDomainId = href ? href.split('/').pop() : null;
+      
+      if (!createdDomainId) {
+        throw new Error('Could not extract domain ID from response');
+      }
       
       return createdDomainId;
     } catch (error) {
@@ -132,7 +179,6 @@ class AuthzForceClient {
    * @throws {Error} When policy addition fails
    */
   async addPolicy(domainId, policyXml, policyId) {
-
     try {
       const response = await this.axios.post(
         `/domains/${domainId}/pap/policies`,
@@ -147,13 +193,22 @@ class AuthzForceClient {
 
       logger.debug(`Added policy with response: ${formatXml(response.data)}`);
 
-      // Extract policy version from response
-      const parser = new xml2js.Parser();
-      const result = await parser.parseStringPromise(response.data);
+      // Parse with DOM and use XPath
+      const doc = this.parseXmlToDom(response.data);
+      
+      // Use XPath to find the href attribute
+      const hrefAttribute = xpath.select1('//*[local-name()="link"]/@href', doc);
+      if(!(isNodeLike(hrefAttribute))) {
+        throw new Error('No link element found in add policy response. Link element is required to extract policy version.');
+      }
+      const href = hrefAttribute.nodeValue;
       
       // The href format is: "PolicySetId/Version", e.g., "MinimalTestPolicySet/1.0"
-      const href = result?.['ns5:link']?.$?.href;
       const version = href ? href.split('/').pop() : null;
+      
+      if (!version) {
+        throw new Error('Could not extract policy version from response');
+      }
       
       return version;
     } catch (error) {
@@ -240,7 +295,7 @@ class AuthzForceClient {
       
       logger.debug(`Evaluation response: ${formatXml(response.data)}`);
 
-      return await this.parseDecisionResponse(response.data);
+      return this.parseDecisionResponse(response.data);
     } catch (error) {
       console.error('Error evaluating request:', error);
       if (error && typeof error === 'object' && 'response' in error) {
@@ -369,34 +424,33 @@ class AuthzForceClient {
   }
 
   /**
-   * Parse XACML decision response
+   * Parse XACML decision response using XPath
    * @param {string} responseXml - XACML response XML
-   * @returns {Promise<XacmlDecisionResponse>} Parsed decision object
+   * @returns {XacmlDecisionResponse} Parsed decision object
    * @private
    */
-  async parseDecisionResponse(responseXml) {
-    const parser = new xml2js.Parser();
-    const result = await parser.parseStringPromise(responseXml);
+  parseDecisionResponse(responseXml) {
+    const doc = this.parseXmlToDom(responseXml);
     
-    // Handle namespaced response
-    const response = result['ns3:Response'] || result.Response;
-    if (!response) {
-      throw new Error('No Response element found in parsed result');
+    // Use XPath with local-name() to ignore namespace prefixes
+    const decision = xpath.select1('//*[local-name()="Decision"]/text()', doc)?.toString();
+    const statusCode = xpath.select1('//*[local-name()="StatusCode"]/@Value', doc)?.toString();
+    
+    if (!decision) {
+      throw new Error('No Decision element found in response');
     }
     
-    const resultElement = response['ns3:Result'] || response.Result;
-    if (!resultElement || !resultElement[0]) {
-      throw new Error('No Result element found in response');
-    }
-    
-    const decision = (resultElement[0]['ns3:Decision'] || resultElement[0].Decision)[0];
-    const status = resultElement[0]['ns3:Status'] || resultElement[0].Status;
+    // Extract obligations and advice if present
+    const obligationResults = xpath.select('//*[local-name()="Obligation"]', doc);
+    const obligations = Array.isArray(obligationResults) ? obligationResults : [];
+    const adviceResults = xpath.select('//*[local-name()="Advice"]', doc);
+    const advice = Array.isArray(adviceResults) ? adviceResults : [];
     
     return {
-      decision,
-      status: status ? status[0].StatusCode[0].$.Value : null,
-      obligations: resultElement[0].Obligations || [],
-      advice: resultElement[0].AssociatedAdvice || []
+      decision: /** @type {'Permit'|'Deny'|'Indeterminate'|'NotApplicable'} */ (decision),
+      status: statusCode || null,
+      obligations: obligations || [],
+      advice: advice || []
     };
   }
 
@@ -407,8 +461,11 @@ class AuthzForceClient {
   async healthCheck() {
     try {
       const response = await this.axios.get('/domains');
+      logger.debug(`Health check response status: ${response.status}`);
+      logger.debug(`Health check response data: ${formatXml(response.data)}`);
       return response.status === 200;
     } catch (error) {
+      logger.error(`Health check failed: ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }

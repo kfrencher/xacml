@@ -28,12 +28,12 @@ describe('System-a', () => {
     beforeAll(async () => {
         client = new AuthzForceClient();
 
-        const isHealthy = await XacmlTestUtils.waitForCondition(() => client.healthCheck(), 60000, 2000);
+        const isHealthy = await XacmlTestUtils.waitForCondition(() => client.healthCheck(), 5000, 2000);
 
         if (!isHealthy) {
             throw new Error('AuthzForce server not available');
         }
-    }, 60000);
+    }, 6000);
 
     afterAll(async () => {
         if (client && createdDomains.length > 0) {
@@ -44,7 +44,12 @@ describe('System-a', () => {
     describe('dataset policy tests', () => {
         beforeEach(async () => {
             domainId = XacmlTestUtils.generateDomainId('system-a');
+            logger.debug(`Creating domain: ${domainId}`);
             domainId = await client.createDomain(domainId);
+            if(!domainId) {
+                throw new Error('Failed to create domain for system-a tests');
+            }
+            logger.debug(`Created domain: ${domainId}`);
             createdDomains.push(domainId);
 
             // await loadPolicy(client, domainId, './policies/system-a-ps_ds-person-ps.xml');

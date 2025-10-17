@@ -5,7 +5,7 @@ import logger from '../src/logger.js';
 // Test configuration
 const testConfig = XacmlTestUtils.createTestSuite({
   name: 'Role-Based Access Control Tests',
-  authzForceUrl: process.env.AUTHZFORCE_URL || 'http://localhost:8080/authzforce-ce',
+  authzForceUrl: process.env.AUTHZFORCE_URL || 'http://127.0.0.1:8080/authzforce-ce',
   timeout: 30000
 });
 
