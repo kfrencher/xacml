@@ -84,22 +84,6 @@ class XacmlTestUtils {
   }
 
   /**
-   * Load test data from JSON file
-   * @param {string} dataPath - Path to test data file (relative or absolute)
-   * @returns {Promise<TestData>} Test data object
-   * @throws {Error} When file cannot be read, doesn't exist, or contains invalid JSON
-   */
-  static async loadTestData(dataPath) {
-    try {
-      const fullPath = path.resolve(dataPath);
-      const content = await fs.readFile(fullPath, 'utf8');
-      return JSON.parse(content);
-    } catch (error) {
-      throw new Error(`Failed to load test data from ${dataPath}: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-
-  /**
    * Create standardized XACML request object
    * @param {TestCaseRequest} [options={}] - Request options
    * @returns {XacmlRequest} XACML request object with defaults applied
@@ -161,29 +145,6 @@ class XacmlTestUtils {
     if (expected.advice) {
       expect(actual.advice).toEqual(expect.arrayContaining(expected.advice));
     }
-  }
-
-  /**
-   * Generate test cases from test data file
-   * @param {string} testDataPath - Path to test data file
-   * @returns {Promise<Array<TestCase>>} Array of test cases with normalized structure
-   * @throws {Error} When file cannot be loaded or doesn't contain testCases array
-   */
-  static async generateTestCases(testDataPath) {
-    const testData = await this.loadTestData(testDataPath);
-    
-    if (!testData.testCases || !Array.isArray(testData.testCases)) {
-      throw new Error('Test data must contain a testCases array');
-    }
-    
-    return testData.testCases.map(testCase => ({
-      name: testCase.name || 'Unnamed test case',
-      description: testCase.description || '',
-      request: this.createRequest(testCase.request || {}),
-      expected: testCase.expected || { decision: 'Permit' },
-      setup: testCase.setup || null,
-      teardown: testCase.teardown || null
-    }));
   }
 
   /**
@@ -284,28 +245,6 @@ class XacmlTestUtils {
     return policyIdMatch ? policyIdMatch[1] : null;
   }
 
-  /**
-   * Create a test suite configuration
-   * @param {Partial<TestSuiteConfig>} [config={}] - Test suite configuration options
-   * @returns {TestSuiteConfig} Normalized configuration with defaults applied
-   */
-  static createTestSuite({
-    name = 'XACML Policy Test Suite',
-    authzForceUrl = 'http://127.0.0.1:8080/authzforce-ce',
-    timeout = 30000,
-    retries = 1,
-    parallel = false,
-    setupTimeout = 60000
-  } = {}) {
-    return {
-      name,
-      authzForceUrl,
-      timeout,
-      retries,
-      parallel,
-      setupTimeout
-    };
-  }
 }
 
 export default XacmlTestUtils;

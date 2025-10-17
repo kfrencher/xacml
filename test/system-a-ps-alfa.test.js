@@ -13,7 +13,7 @@ async function loadPolicy(client, domainId, filePath) {
     const policyXml = await XacmlTestUtils.loadPolicy(filePath);
     const policyId = XacmlTestUtils.extractPolicyId(policyXml);
     if (!policyId) {
-        throw new Error('Failed to extract policy ID from the role-based policy XML');
+        throw new Error('Failed to extract policy ID from the policy XML');
     }
     const version = await client.addPolicy(domainId, policyXml, policyId);
     return { version, policyId };
@@ -52,8 +52,6 @@ describe('System-a', () => {
             logger.debug(`Created domain: ${domainId}`);
             createdDomains.push(domainId);
 
-            // await loadPolicy(client, domainId, './policies/system-a-ps_ds-person-ps.xml');
-            // const { policyId } = await loadPolicy(client, domainId, './policies/system-a-ps.xml');
             await loadPolicy(client, domainId, './build/system_a.groupdataset.xml');
             await loadPolicy(client, domainId, './build/system_a.persondataset.xml');
             const { policyId } = await loadPolicy(client, domainId, './build/system_a.root.xml');

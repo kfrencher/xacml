@@ -30,14 +30,14 @@ describe('Person datasource', () => {
     
     const isHealthy = await XacmlTestUtils.waitForCondition(
       () => client.healthCheck(),
-      60000,
+      10000,
       2000
     );
     
     if (!isHealthy) {
       throw new Error('AuthzForce server not available');
     }
-  }, 60000);
+  }, 10000);
 
   afterAll(async () => {
     if (client && createdDomains.length > 0) {

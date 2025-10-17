@@ -6,12 +6,7 @@
   "main": "src/authzforce-client.js",
   "scripts": {
     "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
     "test:debug": "cross-env LOG_LEVEL=DEBUG jest",
-    "test:quiet": "cross-env LOG_LEVEL=ERROR jest",
-    "type-check": "tsc --noEmit",
-    "lint": "npm run type-check",
     "build:xacml": "node scripts/build-xacml.js",
     "docker:up": "docker-compose -f docker/docker-compose.yml up -d",
     "docker:down": "docker-compose -f docker/docker-compose.yml down",
